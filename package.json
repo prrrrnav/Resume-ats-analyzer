@@ -4,7 +4,7 @@
   "description": "Analyses resumes and generates a summary.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "docx": "^9.5.0",
