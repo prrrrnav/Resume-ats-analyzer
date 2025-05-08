@@ -4,12 +4,11 @@ const mammoth = require('mammoth');
 const { analyzeWithGPT } = require('../services/gptService');
 const { Document, Packer, Paragraph, TextRun, AlignmentType } = require('docx');
 
-// Function to analyze the resume and generate an analysis
 exports.analyzeResume = async (req, res) => {
   try {
     const file = req.file;
     const jobDescription = req.body.jd;
-    const format = req.query.format || 'docx'; // default format is docx
+    const format = req.query.format || 'txt'; 
 
     if (!file) return res.status(400).json({ error: 'No file uploaded' });
 
