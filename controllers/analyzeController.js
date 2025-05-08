@@ -27,7 +27,7 @@ exports.analyzeResume = async (req, res) => {
     } else {
       return res.status(400).json({ error: 'Unsupported file type' });
     }
-
+    
     // Get analysis of the resume using GPT
     const analysis = await analyzeWithGPT(resumeText, jobDescription);
 

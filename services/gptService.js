@@ -23,7 +23,7 @@ ${jd}`;
   const start = Date.now(); 
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o', // ✅ Correct model name
+    model: 'gpt-4o', 
     messages: [
       { role: 'system', content: 'You are an ATS resume evaluator.' },
       { role: 'user', content: prompt },
