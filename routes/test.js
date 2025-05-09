@@ -5,7 +5,7 @@ const verifySource = require('../middleware/verifySource');
 
 
 // Simple GET route for testing
-router.get('/ping',verifySource, (req, res) => {
+router.get('/ping', (req, res) => {
   res.json({ message: 'Server is up and running!' });
 });
 
