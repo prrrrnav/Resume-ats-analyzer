@@ -1,9 +1,11 @@
 // routes/test.js
 const express = require('express');
 const router = express.Router();
+const verifySource = require('../middleware/verifySource');
+
 
 // Simple GET route for testing
-router.get('/ping', (req, res) => {
+router.get('/ping',verifySource, (req, res) => {
   res.json({ message: 'Server is up and running!' });
 });
 

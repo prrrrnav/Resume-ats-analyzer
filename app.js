@@ -5,6 +5,7 @@ const analyzeRoutes = require('./routes/analyze');
 const testRoutes = require('./routes/test');  
 
 app.use(express.json());
+
 app.use('/api/analyze', analyzeRoutes);
 app.use('/api/test', testRoutes);  
 
