@@ -28,12 +28,60 @@ ${jd}`;
       { role: 'system', content: 'You are an ATS resume evaluator.' },
       { role: 'user', content: prompt },
     ],
-    max_tokens: 500,
+    max_tokens: 700,
   });
 
   const end = Date.now();
   const durationInSeconds = (end - start) / 1000;  // Duration in seconds
   console.log(`Response time: ${durationInSeconds} seconds`);
   
+  return response.choices[0].message.content;
+};
+
+exports.optimizeWithGPT = async (resumeText, jd, goalScore = 95, tone = 'professional and concise') => {
+  const prompt = `
+Here is the candidate's resume:
+---
+${resumeText}
+
+Here is the job description:
+---
+${jd}
+
+Your task is to rewrite and optimize this resume to match the job description above. Ensure the following:
+- Match the tone: ${tone}
+- Use strong action verbs and achievement-oriented language.
+- Include relevant keywords and skills from the job description.
+- Format the resume using ATS-friendly structure: Summary, Skills, Experience, Projects (optional), Education.
+- Avoid fancy symbols, tables, and columns. Use plain text formatting.
+- The final resume should be clean, tailored, and able to score at least ${goalScore}/100 in an ATS scan.
+
+Return ONLY the final optimized resume as plain text. Do NOT include extra notes, comments, or headings.
+`.trim();
+
+  const start = Date.now();
+
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: `
+You are an expert ATS resume optimizer. You receive a resume and a job description. Your job is to optimize the resume using the job's language, skills, and structure to maximize ATS score (at least ${goalScore}/100). Always write in a ${tone} tone. Return only the improved resume in plain text.
+        `.trim()
+      },
+      {
+        role: 'user',
+        content: prompt
+      }
+    ],
+    max_tokens: 1200,
+    temperature: 0.7
+  });
+
+  const end = Date.now();
+  const durationInSeconds = (end - start) / 1000;
+  console.log(`Response time: ${durationInSeconds} seconds`);
+
   return response.choices[0].message.content;
 };

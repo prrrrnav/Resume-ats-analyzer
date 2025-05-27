@@ -5,21 +5,9 @@ const { analyzeResume, generateOptimizedResume } = require('../controllers/analy
 const verifySource = require('../middleware/verifySource');
 
 // Main route for resume analysis
-router.post('/', verifySource, upload.single('resume'), (req, res) => {
-  analyzeResume(req, res).then(() => {
-    res.status(200).json({ message: 'Resume analyzed successfully' });
-  }).catch((err) => {
-    res.status(500).json({ error: 'Internal server error', details: err.message });
-  });
-});
+router.post('/', verifySource, upload.single('resume'),analyzeResume);
 
 // Route for generating optimized resume
-router.post('/generate-optimized-resume', verifySource, upload.single('resume'), (req, res) => {
-  generateOptimizedResume(req, res).then(() => {
-    res.status(200).json({ message: 'Optimized resume generated successfully' });
-  }).catch((err) => {
-    res.status(500).json({ error: 'Internal server error', details: err.message });
-  });
-});
+router.post('/generate-optimized-resume', verifySource, upload.single('resume'),generateOptimizedResume)
 
 module.exports = router;

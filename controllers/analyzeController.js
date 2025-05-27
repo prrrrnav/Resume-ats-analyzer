@@ -1,7 +1,7 @@
 const fs = require('fs');
 const pdfParse = require('pdf-parse');
 const mammoth = require('mammoth');
-const { analyzeWithGPT } = require('../services/gptService');
+const { analyzeWithGPT,optimizeWithGPT } = require('../services/gptService');
 const { Document, Packer, Paragraph, TextRun, AlignmentType } = require('docx');
 
 exports.analyzeResume = async (req, res) => {
@@ -18,11 +18,14 @@ exports.analyzeResume = async (req, res) => {
     if (file.mimetype === 'application/pdf') {
       const data = await pdfParse(file.buffer);
       resumeText = data.text;
+      console.log(resumeText);
     } else if (file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
       const result = await mammoth.extractRawText({ buffer: file.buffer });
       resumeText = result.value;
+      console.log(resumeText);
     } else if (file.mimetype === 'text/plain') {
       resumeText = file.buffer.toString('utf-8');
+      console.log(resumeText);
     } else {
       return res.status(400).json({ error: 'Unsupported file type' });
     }
@@ -36,7 +39,8 @@ exports.analyzeResume = async (req, res) => {
         'Content-Type': 'text/plain',
         'Content-Disposition': 'attachment; filename="resume_analysis.txt"',
       });
-      return res.send(analysis);
+      console.log(analysis);
+      return res.status(200).json({ message: 'Resume analyzed successfully', analysis });
     }
 
     // Default: return the analysis as a .docx file
@@ -90,7 +94,7 @@ exports.generateOptimizedResume = async (req, res) => {
     }
 
     // Ask GPT to return a fully optimized resume, not just analysis
-    const optimizedResume = await analyzeWithGPT(resumeText, jobDescription);
+    const optimizedResume = await optimizeWithGPT(resumeText, jobDescription, 98, 'confident and enthusiastic');
 
     // Create a .docx file from the optimized resume content with improved formatting
     const doc = new Document({

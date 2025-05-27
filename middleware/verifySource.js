@@ -7,8 +7,9 @@ module.exports = function verifySource(req, res, next) {
   const RAPIDAPI_SECRET = process.env.RAPIDAPI_SECRET_KEY;
 
   if (rapidApiKey === RAPIDAPI_SECRET || mySecret === `Bearer ${MY_SECRET}`) {
-    return next(); // Allow access
+    return next();
   }
+
 
   return res.status(403).json({ message: 'Access Denied: Unauthorized source' });
 };
