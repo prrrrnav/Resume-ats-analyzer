@@ -75,6 +75,7 @@ exports.generateOptimizedResume = async (req, res) => {
   try {
     const file = req.file;
     const jobDescription = req.body.jd;
+    
 
     if (!file) return res.status(400).json({ error: 'No file uploaded' });
 
@@ -93,60 +94,60 @@ exports.generateOptimizedResume = async (req, res) => {
       return res.status(400).json({ error: 'Unsupported file type' });
     }
 
-    // Ask GPT to return a fully optimized resume, not just analysis
+
     const optimizedResume = await optimizeWithGPT(resumeText, jobDescription, 98, 'confident and enthusiastic');
 
     // Create a .docx file from the optimized resume content with improved formatting
-    const doc = new Document({
-      sections: [
-        {
-          children: [
-            // Title
-            new Paragraph({
-              text: 'Optimized Resume',
-              heading: 'Heading1',
-              alignment: AlignmentType.CENTER,
-              spacing: { after: 300 },
-            }),
+    // const doc = new Document({
+    //   sections: [
+    //     {
+    //       children: [
+    //         // Title
+    //         new Paragraph({
+    //           text: 'Optimized Resume',
+    //           heading: 'Heading1',
+    //           alignment: AlignmentType.CENTER,
+    //           spacing: { after: 300 },
+    //         }),
 
-            // Resume Content
-            ...optimizedResume.split('\n').map((line) => {
-              const trimmed = line.trim();
+    //         // Resume Content
+    //         ...optimizedResume.split('\n').map((line) => {
+    //           const trimmed = line.trim();
 
-              if (trimmed.startsWith('-')) {
-                return new Paragraph({
-                  text: trimmed.substring(1).trim(),
-                  bullet: { level: 0 },
-                  spacing: { before: 200, after: 200 },
-                });
-              }
+    //           if (trimmed.startsWith('-')) {
+    //             return new Paragraph({
+    //               text: trimmed.substring(1).trim(),
+    //               bullet: { level: 0 },
+    //               spacing: { before: 200, after: 200 },
+    //             });
+    //           }
 
-              return new Paragraph({
-                children: [
-                  new TextRun({
-                    text: trimmed,
-                    font: 'Arial',
-                    size: 24,
-                    color: '000000',
-                  }),
-                ],
-                spacing: { before: 200, after: 200 },
-              });
-            }),
-          ],
-        },
-      ],
-    });
+    //           return new Paragraph({
+    //             children: [
+    //               new TextRun({
+    //                 text: trimmed,
+    //                 font: 'Arial',
+    //                 size: 24,
+    //                 color: '000000',
+    //               }),
+    //             ],
+    //             spacing: { before: 200, after: 200 },
+    //           });
+    //         }),
+    //       ],
+    //     },
+    //   ],
+    // });
 
-    const buffer = await Packer.toBuffer(doc);
+    // const buffer = await Packer.toBuffer(doc);
 
-    // Send the optimized resume as a .docx file
-    res.set({
-      'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'Content-Disposition': 'attachment; filename="optimized_resume.docx"',
-    });
+    // // Send the optimized resume as a .docx file
+    // res.set({
+    //   'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    //   'Content-Disposition': 'attachment; filename="optimized_resume.docx"',
+    // });
 
-    res.send(buffer);
+    res.send(optimizedResume);
   } catch (err) {
     console.error('Error generating optimized resume:', err);
     res.status(500).json({ error: 'Internal server error' });
