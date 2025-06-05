@@ -70,7 +70,7 @@ exports.analyzeResume = async (req, res) => {
   }
 };
 
-// New function to generate optimized resume based on the analysis
+
 exports.generateOptimizedResume = async (req, res) => {
   try {
     const file = req.file;
@@ -147,7 +147,114 @@ exports.generateOptimizedResume = async (req, res) => {
     //   'Content-Disposition': 'attachment; filename="optimized_resume.docx"',
     // });
 
-    res.send(optimizedResume);
+    const JsonOptimizedResume = optimizedResume;
+
+    const doc = new Document({
+      sections: [
+        {
+            properties: {
+                page: {
+                    margin: {
+                        top: convertInchesToTwip(0.8),
+                        bottom: convertInchesToTwip(0.8),
+                        left: convertInchesToTwip(0.8),
+                        right: convertInchesToTwip(0.8),
+                    },
+                },
+            },
+            children: [
+                // --- Start of Name & Contact Section (using a Table) ---
+                new Table({
+                    rows: [
+                        new TableRow({
+                            children: [
+                                // Left Cell: Name Heading
+                                new TableCell({
+                                    width: { size: 50, type: WidthType.PERCENTAGE }, // Example: 50% width
+                                    children: [
+                                        createParagraph([
+                                            createTextRun(data.name.toUpperCase(), { // Ensure it's capitalized
+                                                size: 40, // Approx 20pt
+                                                bold: true,
+                                                font: "Calibri Light",
+                                                color: "333333",
+                                            }),
+                                        ], {
+                                            alignment: AlignmentType.LEFT,
+                                            spacing: { after: 0 }, // No extra space after name
+                                        }),
+                                    ],
+                                    verticalAlign: AlignmentType.CENTER, // Align text vertically in cell
+                                    // Hide borders for this cell
+                                    borders: {
+                                        top: { style: BorderStyle.NONE },
+                                        bottom: { style: BorderStyle.NONE },
+                                        left: { style: BorderStyle.NONE },
+                                        right: { style: BorderStyle.NONE },
+                                    },
+                                }),
+                                // Right Cell: Contact Details
+                                new TableCell({
+                                    width: { size: 50, type: WidthType.PERCENTAGE }, // Example: 50% width
+                                    children: [
+                                        // You can add these as separate paragraphs, or one multi-line paragraph
+                                        createParagraph([
+                                            createTextRun(data.contact.phone, { size: 24 }), // 12pt
+                                        ], { alignment: AlignmentType.RIGHT, spacing: { after: 50 } }), // Small space between lines
+
+                                        createParagraph([
+                                            createTextRun(data.contact.email, { size: 24 }), // 12pt
+                                        ], { alignment: AlignmentType.RIGHT, spacing: { after: 50 } }),
+
+                                        // Example for LinkedIn/GitHub with external links
+                                        createParagraph([
+                                            createTextRun("LinkedIn: ", { size: 24 }),
+                                            new docx.ExternalHyperlink({ // Assuming docx is imported, or use ExternalHyperlink directly
+                                                children: [createTextRun(data.contact.linkedin.replace('https://', ''), { size: 24, underline: true, color: "0000FF" })],
+                                                link: data.contact.linkedin,
+                                            }),
+                                        ], { alignment: AlignmentType.RIGHT, spacing: { after: 50 } }),
+
+                                        createParagraph([
+                                            createTextRun("GitHub: ", { size: 24 }),
+                                            new docx.ExternalHyperlink({
+                                                children: [createTextRun(data.contact.github.replace('https://', ''), { size: 24, underline: true, color: "0000FF" })],
+                                                link: data.contact.github,
+                                            }),
+                                        ], { alignment: AlignmentType.RIGHT }), // No space after last item
+                                    ],
+                                    verticalAlign: AlignmentType.CENTER, // Align text vertically in cell
+                                    // Hide borders for this cell
+                                    borders: {
+                                        top: { style: BorderStyle.NONE },
+                                        bottom: { style: BorderStyle.NONE },
+                                        left: { style: BorderStyle.NONE },
+                                        right: { style: BorderStyle.NONE },
+                                    },
+                                }),
+                            ],
+                        }),
+                    ],
+                    // Crucially, hide all borders for the table itself
+                    borders: {
+                        top: { style: BorderStyle.NONE },
+                        bottom: { style: BorderStyle.NONE },
+                        left: { style: BorderStyle.NONE },
+                        right: { style: BorderStyle.NONE },
+                        insideHorizontal: { style: BorderStyle.NONE },
+                        insideVertical: { style: BorderStyle.NONE },
+                    },
+                }),
+                // --- End of Name & Contact Section ---
+
+                // You would add more sections here
+            ],
+        },
+    ],
+    })
+
+
+    res.send(JsonOptimizedResume);
   } catch (err) {
     console.error('Error generating optimized resume:', err);
     res.status(500).json({ error: 'Internal server error' });
